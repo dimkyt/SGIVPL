@@ -35,7 +35,7 @@ void sgivpl::RenderWidget::paintGL()
 {
 }
 
-void sgivpl::RenderWidget::loadSceneFile(std::string filepath)
+void sgivpl::RenderWidget::loadSceneFile(const std::string& filepath)
 {
   m_renderer.reset(new giis::Renderer());
   m_renderer->loadSceneFile(filepath);

@@ -9,6 +9,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SGIVPL", "SGIVPL\SGIVPL.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RendererGIIS", "RendererGIIS\RendererGIIS.vcxproj", "{C1178420-3C7A-4A61-809D-3F812B1323B0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC} = {E1943DCF-64BE-4325-9E56-2AA8170538EC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib3D", "lib3D\lib3D.vcxproj", "{E1943DCF-64BE-4325-9E56-2AA8170538EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +39,13 @@ Global
 		{C1178420-3C7A-4A61-809D-3F812B1323B0}.Release|x64.Build.0 = Release|x64
 		{C1178420-3C7A-4A61-809D-3F812B1323B0}.Release|x86.ActiveCfg = Release|Win32
 		{C1178420-3C7A-4A61-809D-3F812B1323B0}.Release|x86.Build.0 = Release|Win32
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Debug|x64.ActiveCfg = Debug|x64
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Debug|x64.Build.0 = Debug|x64
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Debug|x86.ActiveCfg = Debug|Win32
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Debug|x86.Build.0 = Debug|Win32
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Release|x64.ActiveCfg = Release|Win32
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Release|x86.ActiveCfg = Release|Win32
+		{E1943DCF-64BE-4325-9E56-2AA8170538EC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

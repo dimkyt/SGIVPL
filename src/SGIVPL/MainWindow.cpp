@@ -22,7 +22,7 @@ sgivpl::MainWindow::~MainWindow()
 {
 }
 
-void sgivpl::MainWindow::loadFile(std::string filepath)
+void sgivpl::MainWindow::loadFile(const std::string& filepath)
 {
   m_renderWidget->loadSceneFile(filepath);
 }
@@ -36,7 +36,10 @@ void sgivpl::MainWindow::open()
     tr("Files (*.obj)")
   ).toStdString();
 
-  loadFile(filepath);
+  if (filepath.size() > 0)
+  {
+    loadFile(filepath);
+  }
 }
 
 void sgivpl::MainWindow::createActions()

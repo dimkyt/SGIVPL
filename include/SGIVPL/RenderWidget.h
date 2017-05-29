@@ -24,7 +24,7 @@ namespace sgivpl
     void initializeGL() override;
     void paintGL() override;
 
-    void loadSceneFile(std::string filepath);
+    void loadSceneFile(const std::string& filepath);
 
   private:
     std::unique_ptr<giis::Renderer> m_renderer;

@@ -16,7 +16,7 @@ namespace sgivpl
     MainWindow();
     ~MainWindow();
 
-    void loadFile(std::string filepath);
+    void loadFile(const std::string& filepath);
 
   private slots:
     void open();
