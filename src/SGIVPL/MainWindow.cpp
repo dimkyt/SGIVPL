@@ -10,7 +10,7 @@ sgivpl::MainWindow::MainWindow()
   createActions();
   createMenus();
 
-  setWindowTitle(tr("Menus"));
+  setWindowTitle(tr("SGIVPL"));
   setMinimumSize(800, 600);
   resize(1024, 768);
 
