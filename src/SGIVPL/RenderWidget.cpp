@@ -39,4 +39,5 @@ void sgivpl::RenderWidget::loadSceneFile(const std::string& filepath)
 {
   m_renderer.reset(new giis::Renderer());
   m_renderer->loadSceneFile(filepath);
+  m_renderer->initialise();
 }

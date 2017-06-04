@@ -1,0 +1,29 @@
+#version 450 core
+
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec4 in_position;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec3 in_tex_coords;
+
+uniform mat4 matrix_MVP;
+uniform vec3 in_diffuse_material;
+uniform float in_has_colour_texture;
+uniform float in_has_diffuse_texture;
+
+out vec4 pos_wcs;
+out vec3 normal;
+out vec3 diffuse_material;
+out vec2 texCoord;
+out float has_colour_texture;
+out float has_diffuse_texture;
+
+void main(void)
+{
+  gl_Position = matrix_MVP * in_position;
+  pos_wcs = in_position;
+  normal = in_normal;
+  diffuse_material = in_diffuse_material;
+  texCoord.st = in_tex_coords.st;
+  has_colour_texture = in_has_colour_texture;
+  has_diffuse_texture = in_has_diffuse_texture;
+}

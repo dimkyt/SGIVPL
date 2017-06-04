@@ -35,6 +35,8 @@ namespace lib3d
 
     unsigned int get_material_index() const;
 
+    bool has_texture() const;
+
     void trim_vectors();
 
 

@@ -133,10 +133,22 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\RendererGIIS\glsl.h" />
+    <ClInclude Include="..\include\RendererGIIS\LightSource.h" />
     <ClInclude Include="..\include\RendererGIIS\Renderer.h" />
+    <ClInclude Include="..\include\RendererGIIS\ShaderBase.h" />
+    <ClInclude Include="..\include\RendererGIIS\ShaderRSM.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\RendererGIIS\glsl.cpp" />
+    <ClCompile Include="..\src\RendererGIIS\LightSource.cpp" />
     <ClCompile Include="..\src\RendererGIIS\Renderer.cpp" />
+    <ClCompile Include="..\src\RendererGIIS\ShaderBase.cpp" />
+    <ClCompile Include="..\src\RendererGIIS\ShaderRSM.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\RendererGIIS\shaders\RSM_pass.fragment" />
+    <None Include="..\src\RendererGIIS\shaders\RSM_pass.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -71,6 +71,11 @@ unsigned int lib3d::TriangleGroup::get_material_index() const {
   return m_material_index;
 }
 
+bool lib3d::TriangleGroup::has_texture() const
+{
+  return m_has_texture;
+}
+
 void lib3d::TriangleGroup::trim_vectors() {
   std::vector<unsigned int>(m_vertex_index).swap(m_vertex_index);
   std::vector<unsigned int>(m_texture_index).swap(m_texture_index);
