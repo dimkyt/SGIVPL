@@ -25,9 +25,7 @@ void giis::ShaderRSM::initialise()
   m_uniform_aspect = glGetUniformLocation(m_shaderID, "aspect");
   m_uniform_rsm_near = glGetUniformLocation(m_shaderID, "rsm_near");
   m_uniform_matrix_MVP = glGetUniformLocation(m_shaderID, "matrix_MVP");
-  m_uniform_diffuse_material = glGetUniformLocation(m_shaderID, "diffuse_material");
-  m_uniform_colour_sampler = glGetUniformLocation(m_shaderID, "colour_texture");
-  m_uniform_diffuse_sampler = glGetUniformLocation(m_shaderID, "diffuse_texture");
-  m_has_colour_texture = glGetUniformLocation(m_shaderID, "in_has_colour_texture");
+  m_uniform_diffuse_material = glGetUniformLocation(m_shaderID, "in_diffuse_material");
   m_has_diffuse_texture = glGetUniformLocation(m_shaderID, "in_has_diffuse_texture");
+  m_uniform_diffuse_sampler = glGetUniformLocation(m_shaderID, "diffuse_sampler");
 }

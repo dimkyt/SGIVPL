@@ -1,7 +1,7 @@
 #ifndef LIGHT_SOURCE_H
 #define LIGHT_SOURCE_H
 
-#include "glm\glm.hpp"
+#include "glm\vec3.hpp"
 
 namespace giis
 {
@@ -11,17 +11,20 @@ namespace giis
     LightSource();
     ~LightSource();
 
-    glm::vec3 getPosition() const;
+    inline glm::vec3 getPosition() const { return m_position; }
     void setPosition(glm::vec3& position);
 
-    glm::vec3 getUpVector() const;
+    inline glm::vec3 getUpVector() const { return m_up_vector; }
     void setUpVector(glm::vec3& up_vector);
 
-    glm::vec3 getTargetVector() const;
+    inline glm::vec3 getTargetVector() const { return m_target_vector; }
     void setTargetVector(glm::vec3& target_vector);
 
-    glm::vec3 getIntensity() const;
+    inline glm::vec3 getIntensity() const { return m_intensity; }
     void setIntensity(glm::vec3& intensity);
+
+    inline float getFOV() const { return m_FOV; }
+    void setFOV(float FOV);
 
 
   private:
@@ -29,6 +32,8 @@ namespace giis
     glm::vec3 m_up_vector;
     glm::vec3 m_target_vector;
     glm::vec3 m_intensity;
+
+    float m_FOV;
   };
 }
 #endif // LIGHT_SOURCE_H

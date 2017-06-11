@@ -382,6 +382,7 @@ void lib3d::Mesh::createBuffers()
  
 
   ErrorCheckValue = glGetError();
+  assert(ErrorCheckValue == GL_NO_ERROR);
   if (ErrorCheckValue != GL_NO_ERROR)
   {
     fprintf(
