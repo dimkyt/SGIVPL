@@ -12,16 +12,16 @@ namespace giis
     ~LightSource();
 
     inline glm::vec3 getPosition() const { return m_position; }
-    void setPosition(glm::vec3& position);
+    void setPosition(const glm::vec3& position);
 
     inline glm::vec3 getUpVector() const { return m_up_vector; }
-    void setUpVector(glm::vec3& up_vector);
+    void setUpVector(const glm::vec3& up_vector);
 
     inline glm::vec3 getTargetVector() const { return m_target_vector; }
-    void setTargetVector(glm::vec3& target_vector);
+    void setTargetVector(const glm::vec3& target_vector);
 
     inline glm::vec3 getIntensity() const { return m_intensity; }
-    void setIntensity(glm::vec3& intensity);
+    void setIntensity(const glm::vec3& intensity);
 
     inline float getFOV() const { return m_FOV; }
     void setFOV(float FOV);

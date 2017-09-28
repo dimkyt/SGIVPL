@@ -4,6 +4,7 @@
 // RendererGIIS
 #include "RendererGIIS\LightSource.h"
 #include "RendererGIIS\ShaderRSM.h"
+#include "RendererGIIS\ShaderRenderTexture.h"
 
 // Other
 #include "glm\mat4x4.hpp"
@@ -20,6 +21,15 @@ namespace lib3d
 
 namespace giis
 {
+  enum class RenderTarget
+  {
+    WCS,
+    NORMAL,
+    FLUX,
+    DEPTH
+  };
+
+
   class Renderer
   {
   public:
@@ -30,6 +40,8 @@ namespace giis
 
     void initialise();
     void display();
+
+    void updateLightPosition(const glm::vec3& position);
 
   private:
     // Create required OpenGL textures
@@ -48,12 +60,13 @@ namespace giis
     void renderToRSM();
 
     // Display the specified render target
-    void displayComponent();
+    void displayRenderTarget(RenderTarget target);
 
     std::unique_ptr<lib3d::Mesh> m_scene;
     LightSource m_light_source;
 
     ShaderRSM m_shader_RSM;
+    ShaderRenderTexture m_shader_render_texture;
 
     int m_rsm_width;
     int m_rsm_height;
@@ -72,6 +85,8 @@ namespace giis
     GLuint m_flux_map;	         // flux buffer
     GLuint m_rsm_FBO;            // RSM Frame Buffer Object
     GLuint m_depth_FBO;          // Depth map Frame Buffer Object
+    GLuint m_screen_quad_vaoId;    // Buffers for screen-sized quad
+    GLuint m_screen_quad_vboId;
 
     glm::mat4 m_matrix_M_RSM;      // Model matrix for RSM
     glm::mat4 m_matrix_V_RSM;      // View matrix for RSM

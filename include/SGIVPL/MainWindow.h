@@ -2,16 +2,20 @@
 #define MAINWINDOW_H
 
 #include <QtWidgets/QMainWindow>
+#include <memory>
 
 class QMenu;
 class QAction;
 
 namespace sgivpl
 {
+  class LightOptionsDialog;
   class RenderWidget;
 
   class MainWindow : public QMainWindow
   {
+    Q_OBJECT
+
   public:
     MainWindow();
     ~MainWindow();
@@ -20,6 +24,8 @@ namespace sgivpl
 
   private slots:
     void open();
+    void lightOptions();
+    void acceptLightOptions();
 
   private:
     void createActions();
@@ -30,6 +36,10 @@ namespace sgivpl
     QMenu* m_fileMenu;
     QAction* m_openAction;
 
+    QMenu* m_toolsMenu;
+    QAction* m_lightOptionsAction;
+
+    std::unique_ptr<LightOptionsDialog> m_light_options_dialog;
   };
 }
 

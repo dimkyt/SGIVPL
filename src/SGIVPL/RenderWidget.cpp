@@ -36,11 +36,12 @@ void sgivpl::RenderWidget::initializeGL()
   assert(GlewInitResult == GLEW_OK);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+  connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
 
 void sgivpl::RenderWidget::paintGL()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   if (m_renderer)
   {
     m_renderer->display();
@@ -53,4 +54,10 @@ void sgivpl::RenderWidget::loadSceneFile(const std::string& filepath)
   m_renderer.reset(new giis::Renderer());
   m_renderer->loadSceneFile(filepath);
   m_renderer->initialise();
+  doneCurrent();
+}
+
+void sgivpl::RenderWidget::updateLight(const giis::LightSource & light)
+{
+  m_renderer->updateLightPosition(light.getPosition());
 }

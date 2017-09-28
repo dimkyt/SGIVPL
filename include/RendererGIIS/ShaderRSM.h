@@ -11,9 +11,8 @@ namespace giis
     ShaderRSM();
     ~ShaderRSM();
 
-    void initialise();
+    void initialise() override;
 
-    inline GLuint getShaderID() { return m_shaderID; }
     inline GLuint getMatrixMVP() const { return m_uniform_matrix_MVP; }
     inline GLuint getHasDiffuseTexture() const { return m_has_diffuse_texture; }
     inline GLuint getDiffuseTextureSampler() const { return m_uniform_diffuse_sampler; }

@@ -36,6 +36,9 @@
     <ClInclude Include="..\include\RendererGIIS\ShaderBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\RendererGIIS\ShaderRenderTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RendererGIIS\Renderer.cpp">
@@ -53,12 +56,21 @@
     <ClCompile Include="..\src\RendererGIIS\ShaderBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RendererGIIS\ShaderRenderTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\RendererGIIS\shaders\RSM_pass.vertex">
       <Filter>shaders</Filter>
     </None>
     <None Include="..\src\RendererGIIS\shaders\RSM_pass.fragment">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\RendererGIIS\shaders\RenderTexture.fragment">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\RendererGIIS\shaders\RenderTexture.vertex">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

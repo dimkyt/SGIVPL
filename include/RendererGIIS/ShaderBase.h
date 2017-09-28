@@ -13,6 +13,8 @@ namespace giis
 
     virtual void initialise() = 0;
 
+    inline GLuint getShaderID() { return m_shaderID; }
+
   protected:
     GLuint m_shaderID;
   };

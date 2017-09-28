@@ -13,22 +13,22 @@ giis::LightSource::~LightSource()
 {
 }
 
-void giis::LightSource::setPosition(glm::vec3& position)
+void giis::LightSource::setPosition(const glm::vec3& position)
 {
   m_position = position;
 }
 
-void giis::LightSource::setUpVector(glm::vec3& up_vector)
+void giis::LightSource::setUpVector(const glm::vec3& up_vector)
 {
   m_up_vector = up_vector;
 }
 
-void giis::LightSource::setTargetVector(glm::vec3& target_vector)
+void giis::LightSource::setTargetVector(const glm::vec3& target_vector)
 {
   m_target_vector = target_vector;
 }
 
-void giis::LightSource::setIntensity(glm::vec3& intensity)
+void giis::LightSource::setIntensity(const glm::vec3& intensity)
 {
   m_intensity = intensity;
 }

@@ -5,6 +5,16 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "lib3D\Mesh.h"
 
+static const GLfloat screen_quad_data[] =
+{
+  -1.0f, -1.0f, 0.0f,
+   1.0f, -1.0f, 0.0f,
+  -1.0f,  1.0f, 0.0f,
+  -1.0f,  1.0f, 0.0f,
+   1.0f, -1.0f, 0.0f,
+   1.0f,  1.0f, 0.0f
+};
+
 
 giis::Renderer::Renderer()
   : m_scene(nullptr),
@@ -12,7 +22,7 @@ giis::Renderer::Renderer()
     m_rsm_height(128),
     m_depth_map_width(2048),
     m_depth_map_height(2048),
-    m_rsm_near(200.0f),
+    m_rsm_near(1.0f),
     m_rsm_far(800.0f),
     m_rsm_aspect(1.0f)
 {
@@ -34,7 +44,7 @@ void giis::Renderer::initialise()
   m_rsm_aspect = (float)m_rsm_width / (float)m_rsm_height;
 
   // Light source
-  m_light_source.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+  m_light_source.setPosition(glm::vec3(0.0f, 19.0f, 0.0f));
   m_light_source.setUpVector(glm::vec3(1.0f, 0.0f, 0.0f));
   m_light_source.setTargetVector(glm::vec3(0.0f, 1.0f, 0.0f));
   m_light_source.setIntensity(glm::vec3(500.0f, 500.0f, 500.0f));
@@ -46,11 +56,12 @@ void giis::Renderer::initialise()
 
   // Build shaders
   m_shader_RSM.initialise();
+  m_shader_render_texture.initialise();
 }
 
 void giis::Renderer::createTextures()
 {
-  //setup depth map
+  // setup depth map
   glGenTextures(1, &m_depth_map);
   glBindTexture(GL_TEXTURE_2D, m_depth_map);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, m_depth_map_width, m_depth_map_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -60,7 +71,7 @@ void giis::Renderer::createTextures()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  //setup wcs buffer
+  // setup wcs buffer
   glGenTextures(1, &m_wcs_map);
   glBindTexture(GL_TEXTURE_2D, m_wcs_map);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_rsm_width, m_rsm_height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -70,7 +81,7 @@ void giis::Renderer::createTextures()
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  //setup normal buffer
+  // setup normal buffer
   glGenTextures(1, &m_normal_map);
   glBindTexture(GL_TEXTURE_2D, m_normal_map);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_rsm_width, m_rsm_height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -80,7 +91,7 @@ void giis::Renderer::createTextures()
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  //setup flux buffer
+  // setup flux buffer
   glGenTextures(1, &m_flux_map);
   glBindTexture(GL_TEXTURE_2D, m_flux_map);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_rsm_width, m_rsm_height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -90,7 +101,7 @@ void giis::Renderer::createTextures()
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  //setup RSM depth texture
+  // setup RSM depth texture
   glGenTextures(1, &m_depth_map_low);
   glBindTexture(GL_TEXTURE_2D, m_depth_map_low);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, m_rsm_width, m_rsm_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -99,18 +110,27 @@ void giis::Renderer::createTextures()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glBindTexture(GL_TEXTURE_2D, 0);
+
+  // setup screen-sized quad
+  glGenVertexArrays(1, &m_screen_quad_vaoId);
+  glBindVertexArray(m_screen_quad_vaoId);
+  glGenBuffers(1, &m_screen_quad_vboId);
+  glBindBuffer(GL_ARRAY_BUFFER, m_screen_quad_vboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(screen_quad_data), screen_quad_data, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 }
 
 void giis::Renderer::setupRSM()
 {
   glGenFramebuffers(1, &m_rsm_FBO);
   glBindFramebuffer(GL_FRAMEBUFFER, m_rsm_FBO);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_map_low, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_wcs_map, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normal_map, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_flux_map, 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_map_low, 0);
   assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void giis::Renderer::setupDepthMap()
@@ -119,7 +139,6 @@ void giis::Renderer::setupDepthMap()
   glBindFramebuffer(GL_FRAMEBUFFER, m_depth_FBO);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_map, 0);
   assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void giis::Renderer::calculateMatrices()
@@ -133,6 +152,11 @@ void giis::Renderer::calculateMatrices()
 
 void giis::Renderer::renderToRSM()
 {
+  glViewport(0, 0, m_rsm_width, m_rsm_height);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_rsm_FBO);
+  GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+  glDrawBuffers(3, buffers);
+
   GLenum ErrorCheckValue = glGetError();
   assert(ErrorCheckValue == GL_NO_ERROR);
 
@@ -144,11 +168,6 @@ void giis::Renderer::renderToRSM()
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_CULL_FACE);
 
-  glViewport(0, 0, m_rsm_width, m_rsm_height);
-
-  glBindFramebuffer(GL_FRAMEBUFFER, m_rsm_FBO);
-  GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-  glDrawBuffers(3, buffers);
 
   // Set per-frame uniforms.
   glUseProgram(m_shader_RSM.getShaderID());
@@ -175,11 +194,11 @@ void giis::Renderer::renderToRSM()
     //set diffuse material
     glm::vec3 Kd = m_scene->get_material(triangle_group.get_material_index()).diffuse;
     glUniform3fv(m_shader_RSM.getDiffuseMaterial(), 1, &Kd[0]);
-
+    
     //check for diffuse texture
     float has_diffuse_texture = m_scene->get_material(triangle_group.get_material_index()).has_texture[lib3d::MAP_DIFFUSE];
     glUniform1f(m_shader_RSM.getHasDiffuseTexture(), has_diffuse_texture);
-
+    
     if (has_diffuse_texture == 1.0)
     {
       glActiveTexture(GL_TEXTURE0 + lib3d::MAP_DIFFUSE);
@@ -206,9 +225,56 @@ void giis::Renderer::display()
   calculateMatrices();
   renderToRSM();
 
-  displayComponent();
+  displayRenderTarget(RenderTarget::WCS);
 }
 
-void giis::Renderer::displayComponent()
+void giis::Renderer::updateLightPosition(const glm::vec3& position)
 {
+  m_light_source.setPosition(position);
+}
+
+void giis::Renderer::displayRenderTarget(RenderTarget target)
+{
+  GLuint tgt;
+  switch (target)
+  {
+    case RenderTarget::WCS :
+      tgt = m_wcs_map;
+      break;
+    case RenderTarget::NORMAL :
+      tgt = m_normal_map;
+      break;
+    case RenderTarget::FLUX :
+      tgt = m_flux_map;
+      break;
+    case RenderTarget::DEPTH :
+      tgt = m_depth_map_low;
+      break;
+    default:
+      break;
+  }
+
+  glViewport(0, 0, 1024, 768);
+  glBindFramebuffer(GL_FRAMEBUFFER, 1);
+
+  glClearDepth(1);
+  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+  glDisable(GL_DEPTH_TEST);
+
+  glUseProgram(m_shader_render_texture.getShaderID());
+  glUniform1i(m_shader_render_texture.getColorSampler(), 0);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, tgt);
+
+  glBindVertexArray(m_screen_quad_vaoId);
+  glEnableVertexAttribArray(0);
+
+  // Draw the screen quad
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  glDisableVertexAttribArray(0);
+  glBindVertexArray(0);
+
+  glUseProgram(0);
 }
