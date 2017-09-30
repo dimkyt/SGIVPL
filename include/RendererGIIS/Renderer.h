@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 // RendererGIIS
+#include "RendererGIIS\Enums.h"
 #include "RendererGIIS\LightSource.h"
 #include "RendererGIIS\ShaderRSM.h"
 #include "RendererGIIS\ShaderRenderTexture.h"
@@ -21,15 +22,6 @@ namespace lib3d
 
 namespace giis
 {
-  enum class RenderTarget
-  {
-    WCS,
-    NORMAL,
-    FLUX,
-    DEPTH
-  };
-
-
   class Renderer
   {
   public:
@@ -39,7 +31,7 @@ namespace giis
     void loadSceneFile(const std::string& filepath);
 
     void initialise();
-    void display();
+    void display(RenderMode mode);
 
     void updateLightPosition(const glm::vec3& position);
 

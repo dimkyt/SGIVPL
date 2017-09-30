@@ -7,13 +7,15 @@ in vec2 texCoord;
 in float has_diffuse_texture;
 
 uniform vec3 light_pos;
-uniform vec3 centre_dir;
+uniform vec3 map_centre_dir;
 uniform vec3 constant_intensity;
 uniform float map_size;
 uniform float FOV;
 uniform float aspect;
 uniform float rsm_near;
 uniform sampler2D diffuse_sampler;
+
+layout(early_fragment_tests) in;
 
 // Ouput data
 layout(location = 0) out vec4 out_position_wcs;
@@ -25,15 +27,13 @@ const float PI = 3.14159265358979323846264;
 void main(void)
 { 
   vec3 diffuse_texture_colour = has_diffuse_texture==0.0 ? vec3(1.0, 1.0, 1.0) : texture(diffuse_sampler, texCoord.st).xyz;
-  vec3 centre_d = normalize(centre_dir);
+  vec3 centre_d = normalize(map_centre_dir);
   vec3 r = vec3(pos_wcs.x-light_pos.x, pos_wcs.y-light_pos.y, pos_wcs.z-light_pos.z);
   float costh = max(dot(normalize(r),centre_d),0.0);
-  float solid_angle = (4.0*aspect*pow(tan(radians(FOV/2.0)),2.0)*pow(costh,4.0));
-  vec3 flux = (constant_intensity*solid_angle)/map_size;
+  float solid_angle = (4.0*aspect*pow(tan(radians(FOV*0.5)),2.0)*pow(costh,4.0));
+  vec3 flux = constant_intensity*solid_angle;
   
   float rp = rsm_near/costh;
-  //float Ap = (solid_angle/(map_size))*rp*rp;
-  //vec3 radiance = pow(rp/length(r),2.0)*flux/(PI*Ap);
   float Ap = solid_angle*rp*rp/costh;
   vec3 irradiance = flux/Ap;
   vec3 Kd =  diffuse_material * diffuse_texture_colour;

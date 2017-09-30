@@ -6,6 +6,7 @@
 
 class QMenu;
 class QAction;
+class QActionGroup;
 
 namespace sgivpl
 {
@@ -29,12 +30,22 @@ namespace sgivpl
 
   private:
     void createActions();
+    void createViewMenuActions();
     void createMenus();
+    void createViewMenu();
 
     RenderWidget* m_renderWidget;
 
     QMenu* m_fileMenu;
     QAction* m_openAction;
+
+    QMenu* m_viewMenu;
+    QActionGroup* m_displayModeActionGroup;
+    QAction* m_displayNormal;
+    QAction* m_displayRSMwcs;
+    QAction* m_displayRSMnormal;
+    QAction* m_displayRSMflux;
+    QAction* m_displayRSMdepth;
 
     QMenu* m_toolsMenu;
     QAction* m_lightOptionsAction;

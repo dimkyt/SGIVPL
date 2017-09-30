@@ -2,6 +2,7 @@
 #ifndef RENDERWIDGET_H
 #define RENDERWIDGET_H
 
+#include "RendererGIIS\Enums.h"
 #include "RendererGIIS\LightSource.h"
 
 #include <QOpenGLWidget>
@@ -32,8 +33,12 @@ namespace sgivpl
 
     void updateLight(const giis::LightSource& light);
 
+  //public slots:
+    void updateRenderMode(giis::RenderMode mode);
+
   private:
     std::unique_ptr<giis::Renderer> m_renderer;
+    giis::RenderMode m_render_mode{giis::RenderMode::NORMAL};
 
   };
 }

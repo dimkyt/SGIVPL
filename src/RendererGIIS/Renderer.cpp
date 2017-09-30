@@ -5,6 +5,17 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "lib3D\Mesh.h"
 
+// System
+#include <unordered_map>
+
+static std::unordered_map<giis::RenderMode, giis::RenderTarget> modeToTarget =
+{
+  std::make_pair<giis::RenderMode, giis::RenderTarget>(giis::RenderMode::RSM_WCS, giis::RenderTarget::WCS),
+  std::make_pair<giis::RenderMode, giis::RenderTarget>(giis::RenderMode::RSM_NORMAL, giis::RenderTarget::NORMAL),
+  std::make_pair<giis::RenderMode, giis::RenderTarget>(giis::RenderMode::RSM_FLUX, giis::RenderTarget::FLUX),
+  std::make_pair<giis::RenderMode, giis::RenderTarget>(giis::RenderMode::RSM_DEPTH, giis::RenderTarget::DEPTH_LOW)
+};
+
 static const GLfloat screen_quad_data[] =
 {
   -1.0f, -1.0f, 0.0f,
@@ -46,8 +57,8 @@ void giis::Renderer::initialise()
   // Light source
   m_light_source.setPosition(glm::vec3(0.0f, 19.0f, 0.0f));
   m_light_source.setUpVector(glm::vec3(1.0f, 0.0f, 0.0f));
-  m_light_source.setTargetVector(glm::vec3(0.0f, 1.0f, 0.0f));
-  m_light_source.setIntensity(glm::vec3(500.0f, 500.0f, 500.0f));
+  m_light_source.setTargetVector(glm::vec3(0.0f, -1.0f, 0.0f));
+  m_light_source.setIntensity(glm::vec3(2.0f, 2.0f, 2.0f));
   m_light_source.setFOV(130.0f);
 
   createTextures();
@@ -220,12 +231,15 @@ void giis::Renderer::renderToRSM()
   glUseProgram(0);
 }
 
-void giis::Renderer::display()
+void giis::Renderer::display(RenderMode mode)
 {
   calculateMatrices();
   renderToRSM();
 
-  displayRenderTarget(RenderTarget::WCS);
+  if (mode != RenderMode::NORMAL)
+  {
+    displayRenderTarget(modeToTarget[mode]);
+  }
 }
 
 void giis::Renderer::updateLightPosition(const glm::vec3& position)
@@ -247,7 +261,7 @@ void giis::Renderer::displayRenderTarget(RenderTarget target)
     case RenderTarget::FLUX :
       tgt = m_flux_map;
       break;
-    case RenderTarget::DEPTH :
+    case RenderTarget::DEPTH_LOW :
       tgt = m_depth_map_low;
       break;
     default:

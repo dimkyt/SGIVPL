@@ -133,6 +133,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\RendererGIIS\Enums.h" />
     <ClInclude Include="..\include\RendererGIIS\glsl.h" />
     <ClInclude Include="..\include\RendererGIIS\LightSource.h" />
     <ClInclude Include="..\include\RendererGIIS\Renderer.h" />

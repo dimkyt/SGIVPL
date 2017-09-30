@@ -44,7 +44,7 @@ void sgivpl::RenderWidget::paintGL()
 {
   if (m_renderer)
   {
-    m_renderer->display();
+    m_renderer->display(m_render_mode);
   }
 }
 
@@ -60,4 +60,9 @@ void sgivpl::RenderWidget::loadSceneFile(const std::string& filepath)
 void sgivpl::RenderWidget::updateLight(const giis::LightSource & light)
 {
   m_renderer->updateLightPosition(light.getPosition());
+}
+
+void sgivpl::RenderWidget::updateRenderMode(giis::RenderMode mode)
+{
+  m_render_mode = mode;
 }
