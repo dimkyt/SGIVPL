@@ -42,6 +42,10 @@ namespace giis
     // Set the OpenGL settings for the Reflective Shadow Map.
     void setupRSM();
 
+    // Set the uniforms used for the RSM pass.
+    // They remain unchanged for the whole pass.
+    void setupRSMuniforms();
+
     // Set the OpenGL settings for the Depth Map.
     void setupDepthMap();
 

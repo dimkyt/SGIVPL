@@ -144,6 +144,19 @@ void giis::Renderer::setupRSM()
   assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
+void giis::Renderer::setupRSMuniforms()
+{
+  glUniformMatrix4fv(m_shader_RSM.getMatrixMVP(), 1, GL_FALSE, &m_matrix_MVP_RSM[0][0]);
+  glUniform3fv(m_shader_RSM.getLightPosition(), 1, &m_light_source.getPosition()[0]);
+  glUniform3fv(m_shader_RSM.getMapCentreDirection(), 1, &m_light_source.getTargetVector()[0]);
+  glUniform3fv(m_shader_RSM.getLightIntensity(), 1, &m_light_source.getIntensity()[0]);
+  glUniform1f(m_shader_RSM.getMapSize(), (GLfloat)m_rsm_size);
+  glUniform1f(m_shader_RSM.getFOV(), m_light_source.getFOV());
+  glUniform1f(m_shader_RSM.getAspect(), m_rsm_aspect);
+  glUniform1f(m_shader_RSM.getNearDistance(), m_rsm_near);
+  glUniform1i(m_shader_RSM.getDiffuseTextureSampler(), lib3d::MAP_DIFFUSE);
+}
+
 void giis::Renderer::setupDepthMap()
 {
   glGenFramebuffers(1, &m_depth_FBO);
@@ -182,14 +195,7 @@ void giis::Renderer::renderToRSM()
 
   // Set per-frame uniforms.
   glUseProgram(m_shader_RSM.getShaderID());
-  glUniformMatrix4fv(m_shader_RSM.getMatrixMVP(), 1, GL_FALSE, &m_matrix_MVP_RSM[0][0]);
-  glUniform3fv(m_shader_RSM.getLightPosition(), 1, &m_light_source.getPosition()[0]);
-  glUniform3fv(m_shader_RSM.getMapCentreDirection(), 1, &m_light_source.getTargetVector()[0]);
-  glUniform3fv(m_shader_RSM.getLightIntensity(), 1, &m_light_source.getIntensity()[0]);
-  glUniform1f(m_shader_RSM.getMapSize(), (GLfloat)m_rsm_size);
-  glUniform1f(m_shader_RSM.getFOV(), m_light_source.getFOV());
-  glUniform1f(m_shader_RSM.getAspect(), m_rsm_aspect);
-  glUniform1f(m_shader_RSM.getNearDistance(), m_rsm_near);
+  setupRSMuniforms();
 
   glBindVertexArray(m_scene->get_vertex_array_object_id());
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_scene->get_indexed_buffer_object_id());
@@ -214,8 +220,7 @@ void giis::Renderer::renderToRSM()
     {
       glActiveTexture(GL_TEXTURE0 + lib3d::MAP_DIFFUSE);
       unsigned int diffuse_textureID = m_scene->get_material(triangle_group.get_material_index()).textureID[lib3d::MAP_DIFFUSE];
-      glBindTexture(GL_TEXTURE_2D, diffuse_textureID);
-      glUniform1i(m_shader_RSM.getDiffuseTextureSampler(), lib3d::MAP_DIFFUSE);
+      glBindTexture(GL_TEXTURE_2D, diffuse_textureID);      
     }
 
     glDrawElements(GL_TRIANGLES, triangle_group.get_num_vertex_index(), GL_UNSIGNED_INT, (void*)idxOffset);
@@ -223,6 +228,7 @@ void giis::Renderer::renderToRSM()
   }
 
 
+  glActiveTexture(GL_TEXTURE0);
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
   glDisableVertexAttribArray(2);
