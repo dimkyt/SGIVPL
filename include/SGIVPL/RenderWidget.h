@@ -5,6 +5,8 @@
 #include "RendererGIIS\Enums.h"
 #include "RendererGIIS\LightSource.h"
 
+#include "glm\vec3.hpp"
+
 #include <QOpenGLWidget>
 #include <memory>
 
@@ -31,7 +33,7 @@ namespace sgivpl
 
     void loadSceneFile(const std::string& filepath);
 
-    void updateLight(const giis::LightSource& light);
+    void updateLightPosition(const glm::vec3& position);
 
     glm::vec3 getLightSourcePosition() const;
 

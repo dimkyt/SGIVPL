@@ -3,7 +3,6 @@
 #include "SGIVPL\LightOptionsDialog.h"
 
 #include "RendererGIIS\Enums.h"
-#include "RendererGIIS\LightSource.h"
 
 #include <QtWidgets>
 
@@ -55,11 +54,8 @@ void sgivpl::MainWindow::lightOptions()
 
 void sgivpl::MainWindow::acceptLightOptions()
 {
-  giis::LightSource light;
   LightOptionsDialog* dlg = qobject_cast<LightOptionsDialog*>(sender());
-  light.setPosition(dlg->getLightPosition());
-
-  m_renderWidget->updateLight(light);
+  m_renderWidget->updateLightPosition(dlg->getLightPosition());
 }
 
 void sgivpl::MainWindow::createActions()

@@ -57,11 +57,11 @@ void sgivpl::RenderWidget::loadSceneFile(const std::string& filepath)
   doneCurrent();
 }
 
-void sgivpl::RenderWidget::updateLight(const giis::LightSource & light)
+void sgivpl::RenderWidget::updateLightPosition(const glm::vec3& position)
 {
   if (m_renderer != nullptr)
   {
-    m_renderer->updateLightPosition(light.getPosition());
+    m_renderer->updateLightPosition(position);
   }
 }
 
