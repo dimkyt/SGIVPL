@@ -49,7 +49,6 @@ void sgivpl::MainWindow::open()
 
 void sgivpl::MainWindow::lightOptions()
 {
-  connect(m_light_options_dialog.get(), SIGNAL(accepted()), this, SLOT(acceptLightOptions()));
   m_light_options_dialog->setLightPosition(m_renderWidget->getLightSourcePosition());
   m_light_options_dialog->exec();
 }
@@ -76,6 +75,7 @@ void sgivpl::MainWindow::createActions()
   // Light options
   m_lightOptionsAction = new QAction(tr("&Light Options"), this);
   connect(m_lightOptionsAction, &QAction::triggered, this, &MainWindow::lightOptions);
+  connect(m_light_options_dialog.get(), &LightOptionsDialog::accepted, this, &MainWindow::acceptLightOptions);
 }
 
 void sgivpl::MainWindow::createViewMenuActions()
