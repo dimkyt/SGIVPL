@@ -46,3 +46,10 @@ glm::vec3 sgivpl::LightOptionsDialog::getLightPosition() const
 {
   return glm::vec3(m_light_position_x->text().toFloat(), m_light_position_y->text().toFloat(), m_light_position_z->text().toFloat());
 }
+
+void sgivpl::LightOptionsDialog::setLightPosition(glm::vec3 position)
+{
+  m_light_position_x->setText(QString::number(position.x));
+  m_light_position_y->setText(QString::number(position.y));
+  m_light_position_z->setText(QString::number(position.z));
+}

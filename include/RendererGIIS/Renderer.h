@@ -34,6 +34,7 @@ namespace giis
     void display(RenderMode mode);
 
     void updateLightPosition(const glm::vec3& position);
+    glm::vec3 getLightPosition() const;
 
   private:
     // Create required OpenGL textures

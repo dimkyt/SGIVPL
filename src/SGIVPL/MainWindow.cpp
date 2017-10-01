@@ -50,6 +50,7 @@ void sgivpl::MainWindow::open()
 void sgivpl::MainWindow::lightOptions()
 {
   connect(m_light_options_dialog.get(), SIGNAL(accepted()), this, SLOT(acceptLightOptions()));
+  m_light_options_dialog->setLightPosition(m_renderWidget->getLightSourcePosition());
   m_light_options_dialog->exec();
 }
 

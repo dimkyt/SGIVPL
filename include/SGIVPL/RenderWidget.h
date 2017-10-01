@@ -33,6 +33,8 @@ namespace sgivpl
 
     void updateLight(const giis::LightSource& light);
 
+    glm::vec3 getLightSourcePosition() const;
+
   //public slots:
     void updateRenderMode(giis::RenderMode mode);
 

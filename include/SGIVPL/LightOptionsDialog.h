@@ -20,6 +20,7 @@ namespace sgivpl
     ~LightOptionsDialog();
 
     glm::vec3 getLightPosition() const;
+    void setLightPosition(glm::vec3 position);
 
   private:
     QLineEdit* m_light_position_x;

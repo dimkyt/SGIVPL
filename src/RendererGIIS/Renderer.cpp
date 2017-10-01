@@ -176,8 +176,8 @@ void giis::Renderer::calculateMatrices()
 
 void giis::Renderer::renderToRSM()
 {
-  glViewport(0, 0, m_rsm_width, m_rsm_height);
   glBindFramebuffer(GL_FRAMEBUFFER, m_rsm_FBO);
+  glViewport(0, 0, m_rsm_width, m_rsm_height);
   GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
   glDrawBuffers(3, buffers);
 
@@ -253,6 +253,11 @@ void giis::Renderer::updateLightPosition(const glm::vec3& position)
   m_light_source.setPosition(position);
 }
 
+glm::vec3 giis::Renderer::getLightPosition() const
+{
+  return m_light_source.getPosition();
+}
+
 void giis::Renderer::displayRenderTarget(RenderTarget target)
 {
   GLuint tgt;
@@ -274,8 +279,8 @@ void giis::Renderer::displayRenderTarget(RenderTarget target)
       break;
   }
 
-  glViewport(0, 0, 1024, 768);
   glBindFramebuffer(GL_FRAMEBUFFER, 1);
+  glViewport(0, 0, 1024, 768);
 
   glClearDepth(1);
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

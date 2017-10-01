@@ -62,6 +62,11 @@ void sgivpl::RenderWidget::updateLight(const giis::LightSource & light)
   m_renderer->updateLightPosition(light.getPosition());
 }
 
+glm::vec3 sgivpl::RenderWidget::getLightSourcePosition() const
+{
+  return m_renderer->getLightPosition();
+}
+
 void sgivpl::RenderWidget::updateRenderMode(giis::RenderMode mode)
 {
   m_render_mode = mode;
