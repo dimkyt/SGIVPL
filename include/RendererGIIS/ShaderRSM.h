@@ -21,8 +21,7 @@ namespace giis
     inline GLuint getMapCentreDirection() const { return m_uniform_map_centre_dir; }
     inline GLuint getLightIntensity() const { return m_uniform_intensity; }
     inline GLuint getMapSize() const { return m_uniform_mapSize; }
-    inline GLuint getFOV() const { return m_uniform_FOV; }
-    inline GLuint getAspect() const { return m_uniform_aspect; }
+    inline GLuint getSolidAnglePreCalc() const { return m_solid_angle_precalculated_part; }
     inline GLuint getNearDistance() const { return m_uniform_rsm_near; }
 
   private:
@@ -30,8 +29,7 @@ namespace giis
     GLuint m_uniform_map_centre_dir;
     GLuint m_uniform_intensity;
     GLuint m_uniform_mapSize;
-    GLuint m_uniform_FOV;
-    GLuint m_uniform_aspect;
+    GLuint m_solid_angle_precalculated_part;
     GLuint m_uniform_rsm_near;
     GLuint m_uniform_matrix_MVP;
     GLuint m_uniform_diffuse_material;

@@ -10,8 +10,7 @@ uniform vec3 light_pos;
 uniform vec3 map_centre_dir;
 uniform vec3 constant_intensity;
 uniform float map_size;
-uniform float FOV;
-uniform float aspect;
+uniform float solid_angle_precalculated_part;
 uniform float rsm_near;
 uniform sampler2D diffuse_sampler;
 
@@ -30,7 +29,7 @@ void main(void)
   vec3 centre_d = normalize(map_centre_dir);
   vec3 r = vec3(pos_wcs.x-light_pos.x, pos_wcs.y-light_pos.y, pos_wcs.z-light_pos.z);
   float costh = max(dot(normalize(r),centre_d),0.0);
-  float solid_angle = (4.0*aspect*pow(tan(radians(FOV*0.5)),2.0)*pow(costh,4.0));
+  float solid_angle = solid_angle_precalculated_part*pow(costh,4.0);
   vec3 flux = constant_intensity*solid_angle;
   
   float rp = rsm_near/costh;

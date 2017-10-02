@@ -151,8 +151,7 @@ void giis::Renderer::setupRSMuniforms()
   glUniform3fv(m_shader_RSM.getMapCentreDirection(), 1, &m_light_source.getTargetVector()[0]);
   glUniform3fv(m_shader_RSM.getLightIntensity(), 1, &m_light_source.getIntensity()[0]);
   glUniform1f(m_shader_RSM.getMapSize(), (GLfloat)m_rsm_size);
-  glUniform1f(m_shader_RSM.getFOV(), m_light_source.getFOV());
-  glUniform1f(m_shader_RSM.getAspect(), m_rsm_aspect);
+  glUniform1f(m_shader_RSM.getSolidAnglePreCalc(), 4.0*m_rsm_aspect*glm::pow(glm::tan(glm::radians(m_light_source.getFOV()*0.5)), 2.0));
   glUniform1f(m_shader_RSM.getNearDistance(), m_rsm_near);
   glUniform1i(m_shader_RSM.getDiffuseTextureSampler(), lib3d::MAP_DIFFUSE);
 }
