@@ -54,6 +54,9 @@ void giis::Renderer::initialise()
   m_rsm_size = m_rsm_width * m_rsm_height;
   m_rsm_aspect = (float)m_rsm_width / (float)m_rsm_height;
 
+  // User
+  m_user.eye = {0.0f, 15.0f, 20.0f};
+
   // Light source
   m_light_source.setPosition(glm::vec3(0.0f, 19.0f, 0.0f));
   m_light_source.setUpVector(glm::vec3(1.0f, 0.0f, 0.0f));
@@ -68,6 +71,7 @@ void giis::Renderer::initialise()
   // Build shaders
   m_shader_RSM.initialise();
   m_shader_render_texture.initialise();
+  m_shader_light_pass.initialise();
 }
 
 void giis::Renderer::createTextures()
@@ -151,9 +155,17 @@ void giis::Renderer::setupRSMuniforms()
   glUniform3fv(m_shader_RSM.getMapCentreDirection(), 1, &m_light_source.getTargetVector()[0]);
   glUniform3fv(m_shader_RSM.getLightIntensity(), 1, &m_light_source.getIntensity()[0]);
   glUniform1f(m_shader_RSM.getMapSize(), (GLfloat)m_rsm_size);
-  glUniform1f(m_shader_RSM.getSolidAnglePreCalc(), 4.0*m_rsm_aspect*glm::pow(glm::tan(glm::radians(m_light_source.getFOV()*0.5)), 2.0));
+  glUniform1f(m_shader_RSM.getSolidAnglePreCalc(), 4.0f*m_rsm_aspect*glm::pow(glm::tan(glm::radians(m_light_source.getFOV()*0.5f)), 2.0f));
   glUniform1f(m_shader_RSM.getNearDistance(), m_rsm_near);
   glUniform1i(m_shader_RSM.getDiffuseTextureSampler(), lib3d::MAP_DIFFUSE);
+}
+
+void giis::Renderer::setupLighPassUniforms()
+{
+  glUniformMatrix4fv(m_shader_light_pass.getMatrixMVP(), 1, GL_FALSE, &m_matrix_MVP_user[0][0]);
+  glUniform3fv(m_shader_light_pass.getLightPosition(), 1, &m_light_source.getPosition()[0]);
+  glUniform3fv(m_shader_light_pass.getLightIntensity(), 1, &m_light_source.getIntensity()[0]);
+  glUniform1i(m_shader_light_pass.getDiffuseTextureSampler(), lib3d::MAP_DIFFUSE);
 }
 
 void giis::Renderer::setupDepthMap()
@@ -167,10 +179,16 @@ void giis::Renderer::setupDepthMap()
 void giis::Renderer::calculateMatrices()
 {
   // RSM matrices
-  m_matrix_M_RSM = glm::mat4(1.0f);
-  m_matrix_V_RSM = glm::lookAt(m_light_source.getPosition(), m_light_source.getTargetVector(), m_light_source.getUpVector());
-  m_matrix_P_RSM = glm::perspective(m_light_source.getFOV(), m_rsm_aspect, m_rsm_near, m_rsm_far);
-  m_matrix_MVP_RSM = m_matrix_P_RSM * m_matrix_V_RSM * m_matrix_M_RSM;
+  glm::mat4 matrix_M_RSM = glm::mat4(1.0f);
+  glm::mat4 matrix_V_RSM = glm::lookAt(m_light_source.getPosition(), m_light_source.getTargetVector(), m_light_source.getUpVector());
+  glm::mat4 matrix_P_RSM = glm::perspective(m_light_source.getFOV(), m_rsm_aspect, m_rsm_near, m_rsm_far);
+  m_matrix_MVP_RSM = matrix_P_RSM * matrix_V_RSM * matrix_M_RSM;
+
+  // Camera matrices
+  glm::mat4 matrix_M_user = glm::mat4(1.0f);
+  glm::mat4 matrix_V_user = glm::lookAt(m_user.eye, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::mat4 matrix_P_user = glm::perspective(70.0f, 1024.0f / 768.0f, 1.0f, 800.0f);
+  m_matrix_MVP_user = matrix_P_user * matrix_V_user * matrix_M_user;
 }
 
 void giis::Renderer::renderToRSM()
@@ -236,6 +254,67 @@ void giis::Renderer::renderToRSM()
   glUseProgram(0);
 }
 
+void giis::Renderer::lightPass()
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, 1);
+  glViewport(0, 0, 1024, 768);
+
+  GLenum ErrorCheckValue = glGetError();
+  assert(ErrorCheckValue == GL_NO_ERROR);
+
+  glClearColor(0, 0, 0, 1);
+  glClearDepth(1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glColorMask(1, 1, 1, 1);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+  glEnable(GL_CULL_FACE);
+
+
+  // Set per-frame uniforms.
+  glUseProgram(m_shader_light_pass.getShaderID());
+  setupLighPassUniforms();
+
+  glBindVertexArray(m_scene->get_vertex_array_object_id());
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_scene->get_indexed_buffer_object_id());
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+
+  // Set per-group uniforms and draw
+  const std::vector<lib3d::TriangleGroup> triangle_groups = m_scene->get_triangle_groups();
+  unsigned int idxOffset = 0;
+  for (const lib3d::TriangleGroup triangle_group : triangle_groups)
+  {
+    //set diffuse material
+    glm::vec3 Kd = m_scene->get_material(triangle_group.get_material_index()).diffuse;
+    glUniform3fv(m_shader_light_pass.getDiffuseMaterial(), 1, &Kd[0]);
+
+    //check for diffuse texture
+    float has_diffuse_texture = m_scene->get_material(triangle_group.get_material_index()).has_texture[lib3d::MAP_DIFFUSE];
+    glUniform1f(m_shader_light_pass.getHasDiffuseTexture(), has_diffuse_texture);
+
+    if (has_diffuse_texture == 1.0)
+    {
+      glActiveTexture(GL_TEXTURE0 + lib3d::MAP_DIFFUSE);
+      unsigned int diffuse_textureID = m_scene->get_material(triangle_group.get_material_index()).textureID[lib3d::MAP_DIFFUSE];
+      glBindTexture(GL_TEXTURE_2D, diffuse_textureID);
+    }
+
+    glDrawElements(GL_TRIANGLES, triangle_group.get_num_vertex_index(), GL_UNSIGNED_INT, (void*)idxOffset);
+    idxOffset += triangle_group.get_num_vertex_index() * sizeof(unsigned int);
+  }
+
+
+  glActiveTexture(GL_TEXTURE0);
+  glDisableVertexAttribArray(0);
+  glDisableVertexAttribArray(1);
+  glDisableVertexAttribArray(2);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+  glUseProgram(0);
+}
+
 void giis::Renderer::display(RenderMode mode)
 {
   calculateMatrices();
@@ -244,6 +323,10 @@ void giis::Renderer::display(RenderMode mode)
   if (mode != RenderMode::NORMAL)
   {
     displayRenderTarget(modeToTarget[mode]);
+  }
+  else
+  {
+    lightPass();
   }
 }
 

@@ -6,6 +6,7 @@
 #include "RendererGIIS\LightSource.h"
 #include "RendererGIIS\ShaderRSM.h"
 #include "RendererGIIS\ShaderRenderTexture.h"
+#include "RendererGIIS\ShaderLightPass.h"
 
 // Other
 #include "glm\mat4x4.hpp"
@@ -22,6 +23,18 @@ namespace lib3d
 
 namespace giis
 {
+  struct User
+  {
+    glm::vec3 eye;
+    glm::vec3 center;
+    glm::vec3 up;
+    glm::vec3 dir;
+    glm::vec3 dir_strafe;
+    float speed;
+    float miny;
+    float maxy;
+  };
+
   class Renderer
   {
   public:
@@ -47,6 +60,8 @@ namespace giis
     // They remain unchanged for the whole pass.
     void setupRSMuniforms();
 
+    void setupLighPassUniforms();
+
     // Set the OpenGL settings for the Depth Map.
     void setupDepthMap();
 
@@ -56,6 +71,9 @@ namespace giis
     // Render to Reflective Shadow Map target
     void renderToRSM();
 
+    // Render the scene with lighting
+    void lightPass();
+
     // Display the specified render target
     void displayRenderTarget(RenderTarget target);
 
@@ -64,6 +82,9 @@ namespace giis
 
     ShaderRSM m_shader_RSM;
     ShaderRenderTexture m_shader_render_texture;
+    ShaderLightPass m_shader_light_pass;
+
+    User m_user;
 
     int m_rsm_width;
     int m_rsm_height;
@@ -85,10 +106,8 @@ namespace giis
     GLuint m_screen_quad_vaoId;    // Buffers for screen-sized quad
     GLuint m_screen_quad_vboId;
 
-    glm::mat4 m_matrix_M_RSM;      // Model matrix for RSM
-    glm::mat4 m_matrix_V_RSM;      // View matrix for RSM
-    glm::mat4 m_matrix_P_RSM;      // Projection matrix for RSM
     glm::mat4 m_matrix_MVP_RSM;    // Modelview Projection matrix for RSM
+    glm::mat4 m_matrix_MVP_user;   // Modelview Projection matrix for the user
   };
 }
 
