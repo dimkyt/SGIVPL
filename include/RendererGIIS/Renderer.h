@@ -15,6 +15,7 @@
 #include <GL\glew.h>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace lib3d
 {
@@ -33,6 +34,15 @@ namespace giis
     float speed;
     float miny;
     float maxy;
+  };
+
+  struct VPL
+  {
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec3 contribution;
+
+    bool isValid{ true };
   };
 
   class Renderer
@@ -71,6 +81,9 @@ namespace giis
     // Render to Reflective Shadow Map target
     void renderToRSM();
 
+    // Aggregate RSM VPLs
+    void aggregateRSM();
+
     // Render the scene with lighting
     void lightPass();
 
@@ -86,6 +99,8 @@ namespace giis
 
     User m_user;
 
+    int m_win_width;
+    int m_win_height;
     int m_rsm_width;
     int m_rsm_height;
     int m_rsm_size;
@@ -95,6 +110,10 @@ namespace giis
     float m_rsm_near;
     float m_rsm_far;
     float m_rsm_aspect;
+
+    std::vector<float> m_wcs_buffer;
+    std::vector<float> m_normal_buffer;
+    std::vector<float> m_flux_buffer;
 
     GLuint m_depth_map;	         // depth buffer
     GLuint m_depth_map_low;	     // RSM depth buffer

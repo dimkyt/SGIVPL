@@ -29,6 +29,8 @@ static const GLfloat screen_quad_data[] =
 
 giis::Renderer::Renderer()
   : m_scene(nullptr),
+    m_win_width(1024),
+    m_win_height(768),
     m_rsm_width(128),
     m_rsm_height(128),
     m_depth_map_width(2048),
@@ -54,8 +56,12 @@ void giis::Renderer::initialise()
   m_rsm_size = m_rsm_width * m_rsm_height;
   m_rsm_aspect = (float)m_rsm_width / (float)m_rsm_height;
 
+  m_wcs_buffer.resize(m_rsm_size*3);
+  m_normal_buffer.resize(m_rsm_size*3);
+  m_flux_buffer.resize(m_rsm_size*3);
+
   // User
-  m_user.eye = {0.0f, 15.0f, 20.0f};
+  m_user.eye = {0.0f, 25.0f, 20.0f};
 
   // Light source
   m_light_source.setPosition(glm::vec3(0.0f, 19.0f, 0.0f));
@@ -89,7 +95,7 @@ void giis::Renderer::createTextures()
   // setup wcs buffer
   glGenTextures(1, &m_wcs_map);
   glBindTexture(GL_TEXTURE_2D, m_wcs_map);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_rsm_width, m_rsm_height, 0, GL_RGBA, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_rsm_width, m_rsm_height, 0, GL_RGB, GL_FLOAT, NULL);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -99,7 +105,7 @@ void giis::Renderer::createTextures()
   // setup normal buffer
   glGenTextures(1, &m_normal_map);
   glBindTexture(GL_TEXTURE_2D, m_normal_map);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_rsm_width, m_rsm_height, 0, GL_RGBA, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_rsm_width, m_rsm_height, 0, GL_RGB, GL_FLOAT, NULL);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -109,7 +115,7 @@ void giis::Renderer::createTextures()
   // setup flux buffer
   glGenTextures(1, &m_flux_map);
   glBindTexture(GL_TEXTURE_2D, m_flux_map);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_rsm_width, m_rsm_height, 0, GL_RGBA, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_rsm_width, m_rsm_height, 0, GL_RGB, GL_FLOAT, NULL);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -187,7 +193,7 @@ void giis::Renderer::calculateMatrices()
   // Camera matrices
   glm::mat4 matrix_M_user = glm::mat4(1.0f);
   glm::mat4 matrix_V_user = glm::lookAt(m_user.eye, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  glm::mat4 matrix_P_user = glm::perspective(70.0f, 1024.0f / 768.0f, 1.0f, 800.0f);
+  glm::mat4 matrix_P_user = glm::perspective(70.0f, (float)m_win_width / (float)m_win_height, 1.0f, 800.0f);
   m_matrix_MVP_user = matrix_P_user * matrix_V_user * matrix_M_user;
 }
 
@@ -254,10 +260,25 @@ void giis::Renderer::renderToRSM()
   glUseProgram(0);
 }
 
+void giis::Renderer::aggregateRSM()
+{
+  //Copy RSM to buffers for aggregation
+  glBindTexture(GL_TEXTURE_2D, m_wcs_map);
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, &m_wcs_buffer[0]);
+  
+  glBindTexture(GL_TEXTURE_2D, m_normal_map);
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, &m_normal_buffer[0]);
+  
+  glBindTexture(GL_TEXTURE_2D, m_flux_map);
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, &m_flux_buffer[0]);
+  
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void giis::Renderer::lightPass()
 {
   glBindFramebuffer(GL_FRAMEBUFFER, 1);
-  glViewport(0, 0, 1024, 768);
+  glViewport(0, 0, m_win_width, m_win_height);
 
   GLenum ErrorCheckValue = glGetError();
   assert(ErrorCheckValue == GL_NO_ERROR);
@@ -319,6 +340,7 @@ void giis::Renderer::display(RenderMode mode)
 {
   calculateMatrices();
   renderToRSM();
+  aggregateRSM();
 
   if (mode != RenderMode::NORMAL)
   {
@@ -362,7 +384,7 @@ void giis::Renderer::displayRenderTarget(RenderTarget target)
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 1);
-  glViewport(0, 0, 1024, 768);
+  glViewport(0, 0, m_win_width, m_win_height);
 
   glClearDepth(1);
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
