@@ -59,9 +59,10 @@ void giis::Renderer::initialise()
   m_wcs_buffer.resize(m_rsm_size*3);
   m_normal_buffer.resize(m_rsm_size*3);
   m_flux_buffer.resize(m_rsm_size*3);
+  m_VPL_buffer.resize(m_rsm_size);
 
   // User
-  m_user.eye = {0.0f, 25.0f, 20.0f};
+  m_user.eye = {0.0f, 10.0f, 27.0f};
 
   // Light source
   m_light_source.setPosition(glm::vec3(0.0f, 19.0f, 0.0f));
@@ -72,11 +73,12 @@ void giis::Renderer::initialise()
 
   createTextures();
   setupRSM();
-  //setupDepthMap();
+  setupDepthMap();
 
   // Build shaders
   m_shader_RSM.initialise();
   m_shader_render_texture.initialise();
+  m_shader_shadow_pass.initialise();
   m_shader_light_pass.initialise();
 }
 
@@ -192,7 +194,7 @@ void giis::Renderer::calculateMatrices()
 
   // Camera matrices
   glm::mat4 matrix_M_user = glm::mat4(1.0f);
-  glm::mat4 matrix_V_user = glm::lookAt(m_user.eye, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::mat4 matrix_V_user = glm::lookAt(m_user.eye, glm::vec3(0.0f, 9.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   glm::mat4 matrix_P_user = glm::perspective(70.0f, (float)m_win_width / (float)m_win_height, 1.0f, 800.0f);
   m_matrix_MVP_user = matrix_P_user * matrix_V_user * matrix_M_user;
 }
@@ -260,9 +262,42 @@ void giis::Renderer::renderToRSM()
   glUseProgram(0);
 }
 
+void giis::Renderer::shadowPass()
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, m_depth_map);
+  glViewport(0, 0, m_depth_map_width, m_depth_map_height);
+
+  glClearDepth(1);
+  glClear(GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+  glEnable(GL_CULL_FACE);
+
+  glUseProgram(m_shader_shadow_pass.getShaderID());
+  glUniformMatrix4fv(m_shader_shadow_pass.getMatrixMVP(), 1, GL_FALSE, &m_matrix_MVP_RSM[0][0]);
+
+  glBindVertexArray(m_scene->get_vertex_array_object_id());
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_scene->get_indexed_buffer_object_id());
+
+  const std::vector<lib3d::TriangleGroup> triangle_groups = m_scene->get_triangle_groups();
+  unsigned int idxOffset = 0;
+  for (const lib3d::TriangleGroup triangle_group : triangle_groups)
+  {
+    glDrawElements(GL_TRIANGLES, triangle_group.get_num_vertex_index(), GL_UNSIGNED_INT, (void*)idxOffset);
+    idxOffset += triangle_group.get_num_vertex_index() * sizeof(unsigned int);
+  }
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glDisableVertexAttribArray(0);
+  glBindVertexArray(0);
+
+  glUseProgram(0);
+}
+
 void giis::Renderer::aggregateRSM()
 {
-  //Copy RSM to buffers for aggregation
+  // Copy RSM to buffers for aggregation
   glBindTexture(GL_TEXTURE_2D, m_wcs_map);
   glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, &m_wcs_buffer[0]);
   
@@ -273,6 +308,26 @@ void giis::Renderer::aggregateRSM()
   glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, &m_flux_buffer[0]);
   
   glBindTexture(GL_TEXTURE_2D, 0);
+
+
+  // Populate VPL buffer
+  glm::vec3 invalid_normal{ 0.0f, 0.0f, 0.0f };
+  for (int i=0; i<m_rsm_size; ++i)
+  {
+    int index = i * 3;
+    giis::VPL& vpl = m_VPL_buffer[i];
+    vpl.normal = { m_normal_buffer[index], m_normal_buffer[index + 1], m_normal_buffer[index + 2] };
+
+    if (vpl.normal == invalid_normal)
+    {
+      vpl.isValid = false;
+      continue;
+    }
+
+    vpl.position = { m_wcs_buffer[index], m_wcs_buffer[index + 1], m_wcs_buffer[index + 2] };
+    vpl.contribution = { m_flux_buffer[index], m_flux_buffer[index + 1], m_flux_buffer[index + 2] };
+    vpl.num_contained = 1;
+  }
 }
 
 void giis::Renderer::lightPass()
@@ -340,6 +395,7 @@ void giis::Renderer::display(RenderMode mode)
 {
   calculateMatrices();
   renderToRSM();
+  shadowPass();
   aggregateRSM();
 
   if (mode != RenderMode::NORMAL)
@@ -377,7 +433,7 @@ void giis::Renderer::displayRenderTarget(RenderTarget target)
       tgt = m_flux_map;
       break;
     case RenderTarget::DEPTH_LOW :
-      tgt = m_depth_map_low;
+      tgt = m_depth_map;
       break;
     default:
       break;

@@ -141,6 +141,7 @@
     <ClInclude Include="..\include\RendererGIIS\ShaderLightPass.h" />
     <ClInclude Include="..\include\RendererGIIS\ShaderRenderTexture.h" />
     <ClInclude Include="..\include\RendererGIIS\ShaderRSM.h" />
+    <ClInclude Include="..\include\RendererGIIS\ShaderShadowPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RendererGIIS\glsl.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="..\src\RendererGIIS\ShaderLightPass.cpp" />
     <ClCompile Include="..\src\RendererGIIS\ShaderRenderTexture.cpp" />
     <ClCompile Include="..\src\RendererGIIS\ShaderRSM.cpp" />
+    <ClCompile Include="..\src\RendererGIIS\ShaderShadowPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\RendererGIIS\shaders\LightPass.fragment" />
@@ -158,6 +160,8 @@
     <None Include="..\src\RendererGIIS\shaders\RenderTexture.vertex" />
     <None Include="..\src\RendererGIIS\shaders\RSM_pass.fragment" />
     <None Include="..\src\RendererGIIS\shaders\RSM_pass.vertex" />
+    <None Include="..\src\RendererGIIS\shaders\ShadowPass.fragment" />
+    <None Include="..\src\RendererGIIS\shaders\ShadowPass.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

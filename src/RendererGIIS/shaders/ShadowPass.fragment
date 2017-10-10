@@ -1,0 +1,7 @@
+#version 450 core
+
+// This is just a pass-through shader
+
+void main()
+{
+}

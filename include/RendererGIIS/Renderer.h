@@ -4,9 +4,10 @@
 // RendererGIIS
 #include "RendererGIIS\Enums.h"
 #include "RendererGIIS\LightSource.h"
-#include "RendererGIIS\ShaderRSM.h"
-#include "RendererGIIS\ShaderRenderTexture.h"
 #include "RendererGIIS\ShaderLightPass.h"
+#include "RendererGIIS\ShaderRenderTexture.h"
+#include "RendererGIIS\ShaderRSM.h"
+#include "RendererGIIS\ShaderShadowPass.h"
 
 // Other
 #include "glm\mat4x4.hpp"
@@ -43,6 +44,7 @@ namespace giis
     glm::vec3 contribution;
 
     bool isValid{ true };
+    unsigned num_contained{ 0 };
   };
 
   class Renderer
@@ -81,6 +83,9 @@ namespace giis
     // Render to Reflective Shadow Map target
     void renderToRSM();
 
+    // Generate high resolution shadow map
+    void shadowPass();
+
     // Aggregate RSM VPLs
     void aggregateRSM();
 
@@ -95,6 +100,7 @@ namespace giis
 
     ShaderRSM m_shader_RSM;
     ShaderRenderTexture m_shader_render_texture;
+    ShaderShadowPass m_shader_shadow_pass;
     ShaderLightPass m_shader_light_pass;
 
     User m_user;
@@ -114,6 +120,7 @@ namespace giis
     std::vector<float> m_wcs_buffer;
     std::vector<float> m_normal_buffer;
     std::vector<float> m_flux_buffer;
+    std::vector<VPL> m_VPL_buffer;
 
     GLuint m_depth_map;	         // depth buffer
     GLuint m_depth_map_low;	     // RSM depth buffer

@@ -45,6 +45,9 @@
     <ClInclude Include="..\include\RendererGIIS\ShaderLightPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\RendererGIIS\ShaderShadowPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\RendererGIIS\Renderer.cpp">
@@ -68,6 +71,9 @@
     <ClCompile Include="..\src\RendererGIIS\ShaderLightPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RendererGIIS\ShaderShadowPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\RendererGIIS\shaders\RSM_pass.vertex">
@@ -86,6 +92,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="..\src\RendererGIIS\shaders\LightPass.vertex">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\RendererGIIS\shaders\ShadowPass.vertex">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\RendererGIIS\shaders\ShadowPass.fragment">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
