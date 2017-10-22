@@ -7,7 +7,7 @@ in vec2 texCoord;
 in float has_diffuse_texture;
 
 uniform vec3 light_pos;
-uniform vec3 map_centre_dir;
+uniform vec3 map_centre_dir;           // normalized
 uniform vec3 constant_intensity;
 uniform float map_size;
 uniform float solid_angle_precalculated_part;
@@ -26,10 +26,9 @@ const float PI = 3.14159265358979323846264;
 void main(void)
 { 
   vec3 diffuse_texture_colour = has_diffuse_texture==0.0 ? vec3(1.0, 1.0, 1.0) : texture(diffuse_sampler, texCoord.st).xyz;
-  vec3 centre_d = normalize(map_centre_dir);
-  vec3 r = pos_wcs - light_pos;
-  float costh = max(dot(normalize(r),centre_d),0.0);
-  float solid_angle = solid_angle_precalculated_part*pow(costh,4.0);
+  vec3 r = normalize(pos_wcs - light_pos);
+  float costh = max(dot(r,map_centre_dir),0.0);
+  float solid_angle = solid_angle_precalculated_part*pow(costh,3.0);
   vec3 flux = constant_intensity*solid_angle;
   
   float rp = rsm_near/costh;
