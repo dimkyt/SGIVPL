@@ -34,6 +34,9 @@
     <ClInclude Include="..\include\lib3D\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\lib3D\BBox3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\lib3D\Mesh.cpp">
@@ -46,6 +49,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lib3D\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lib3D\BBox3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

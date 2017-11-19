@@ -164,6 +164,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\lib3D\BBox3D.h" />
     <ClInclude Include="..\include\lib3D\Material.h" />
     <ClInclude Include="..\include\lib3D\Mesh.h" />
     <ClInclude Include="..\include\lib3D\Texture.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\lib3D\BBox3D.cpp" />
     <ClCompile Include="..\src\lib3D\Material.cpp" />
     <ClCompile Include="..\src\lib3D\Mesh.cpp" />
     <ClCompile Include="..\src\lib3D\Texture.cpp" />

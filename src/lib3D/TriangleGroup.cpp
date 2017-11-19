@@ -27,6 +27,11 @@ void lib3d::TriangleGroup::add_face() {
   m_num_faces++;
 }
 
+void lib3d::TriangleGroup::expand_bounding_box(const glm::vec3 & p)
+{
+  m_bounding_box.add_point(p);
+}
+
 void lib3d::TriangleGroup::set_material_index(unsigned int index) {
   m_material_index = index;
 }

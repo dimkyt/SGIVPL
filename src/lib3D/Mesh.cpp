@@ -154,19 +154,24 @@ void lib3d::Mesh::objLoader(const std::string& filepath)
         vIdx-=tmp1;
       }
 
-      m_triangle_groups.back().add_vertex_index(vIdx.x);
-      m_triangle_groups.back().add_vertex_index(vIdx.y);
-      m_triangle_groups.back().add_vertex_index(vIdx.z);
+      TriangleGroup& t_group = m_triangle_groups.back();
 
-      m_triangle_groups.back().add_texture_index(tIdx.x);
-      m_triangle_groups.back().add_texture_index(tIdx.y);
-      m_triangle_groups.back().add_texture_index(tIdx.z);
+      t_group.add_vertex_index(vIdx.x);
+      t_group.add_vertex_index(vIdx.y);
+      t_group.add_vertex_index(vIdx.z);
+      t_group.expand_bounding_box(m_vertices[vIdx.x]);
+      t_group.expand_bounding_box(m_vertices[vIdx.y]);
+      t_group.expand_bounding_box(m_vertices[vIdx.z]);
 
-      m_triangle_groups.back().add_normal_index(nIdx.x);
-      m_triangle_groups.back().add_normal_index(nIdx.y);
-      m_triangle_groups.back().add_normal_index(nIdx.z);
+      t_group.add_texture_index(tIdx.x);
+      t_group.add_texture_index(tIdx.y);
+      t_group.add_texture_index(tIdx.z);
 
-      m_triangle_groups.back().add_face();
+      t_group.add_normal_index(nIdx.x);
+      t_group.add_normal_index(nIdx.y);
+      t_group.add_normal_index(nIdx.z);
+
+      t_group.add_face();
       m_numFaces++;
     }
   }

@@ -1,7 +1,10 @@
 #ifndef _TriangleGroup_
 #define _TriangleGroup_
 
-#include <glm\glm.hpp>
+#include "lib3D\BBox3D.h"
+
+#include "glm\vec3.hpp"
+
 #include <vector>
 
 
@@ -18,6 +21,8 @@ namespace lib3d
     void add_normal_index(unsigned int);
 
     void add_face();
+
+    void expand_bounding_box(const glm::vec3& p);
 
     void set_material_index(unsigned int);
     void set_texture_flag(bool);
@@ -46,6 +51,8 @@ namespace lib3d
     std::vector<unsigned int> m_vertex_index;
     std::vector<unsigned int> m_texture_index;
     std::vector<unsigned int> m_normal_index;
+
+    BBox3D m_bounding_box;
 
     unsigned int m_material_index;
 
