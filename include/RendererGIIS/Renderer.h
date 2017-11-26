@@ -4,6 +4,7 @@
 // RendererGIIS
 #include "RendererGIIS\Enums.h"
 #include "RendererGIIS\LightSource.h"
+#include "RendererGIIS\ShaderDrawVPLs.h"
 #include "RendererGIIS\ShaderLightPass.h"
 #include "RendererGIIS\ShaderRenderTexture.h"
 #include "RendererGIIS\ShaderRSM.h"
@@ -95,6 +96,9 @@ namespace giis
     // Display the specified render target
     void displayRenderTarget(RenderTarget target);
 
+    // Draw the VPLs. For Debug purposes.
+    void drawVPLs();
+
     std::unique_ptr<lib3d::Mesh> m_scene;
     LightSource m_light_source;
 
@@ -102,20 +106,21 @@ namespace giis
     ShaderRenderTexture m_shader_render_texture;
     ShaderShadowPass m_shader_shadow_pass;
     ShaderLightPass m_shader_light_pass;
+    ShaderDrawVPLs m_shader_draw_vpls;
 
     User m_user;
 
-    int m_win_width;
-    int m_win_height;
-    int m_rsm_width;
-    int m_rsm_height;
-    int m_rsm_size;
-    int m_depth_map_width;
-    int m_depth_map_height;
+    int m_win_width {1024};
+    int m_win_height {768};
+    int m_rsm_width {128};
+    int m_rsm_height {128};
+    int m_rsm_size {0};
+    int m_depth_map_width {2048};
+    int m_depth_map_height {2048};
 
-    float m_rsm_near;
-    float m_rsm_far;
-    float m_rsm_aspect;
+    float m_rsm_near {1.0f};
+    float m_rsm_far {800.0f};
+    float m_rsm_aspect {1.0f};
 
     std::vector<float> m_wcs_buffer;
     std::vector<float> m_normal_buffer;
@@ -131,6 +136,11 @@ namespace giis
     GLuint m_depth_FBO;          // Depth map Frame Buffer Object
     GLuint m_screen_quad_vaoId;    // Buffers for screen-sized quad
     GLuint m_screen_quad_vboId;
+
+    // Used for Debug draw
+    bool m_draw_vpls {false};
+    GLuint m_vpl_vao;
+    GLuint m_vpl_vbo;
 
     glm::mat4 m_matrix_MVP_RSM;    // Modelview Projection matrix for RSM
     glm::mat4 m_matrix_MVP_user;   // Modelview Projection matrix for the user

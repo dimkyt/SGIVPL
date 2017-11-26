@@ -28,16 +28,6 @@ static const GLfloat screen_quad_data[] =
 
 
 giis::Renderer::Renderer()
-  : m_scene(nullptr),
-    m_win_width(1024),
-    m_win_height(768),
-    m_rsm_width(128),
-    m_rsm_height(128),
-    m_depth_map_width(2048),
-    m_depth_map_height(2048),
-    m_rsm_near(1.0f),
-    m_rsm_far(800.0f),
-    m_rsm_aspect(1.0f)
 {
 }
 
@@ -80,6 +70,11 @@ void giis::Renderer::initialise()
   m_shader_render_texture.initialise();
   m_shader_shadow_pass.initialise();
   m_shader_light_pass.initialise();
+  m_shader_draw_vpls.initialise();
+
+  // Debug draw buffers
+  glGenVertexArrays(1, &m_vpl_vao);
+  glGenBuffers(1, &m_vpl_vbo);
 }
 
 void giis::Renderer::createTextures()
@@ -406,6 +401,11 @@ void giis::Renderer::display(RenderMode mode)
   {
     lightPass();
   }
+
+  if (m_draw_vpls)
+  {
+    drawVPLs();
+  }
 }
 
 void giis::Renderer::updateLightPosition(const glm::vec3& position)
@@ -461,5 +461,36 @@ void giis::Renderer::displayRenderTarget(RenderTarget target)
   glDisableVertexAttribArray(0);
   glBindVertexArray(0);
 
+  glUseProgram(0);
+}
+
+void giis::Renderer::drawVPLs()
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, 1);
+  glViewport(0, 0, m_win_width, m_win_height);
+
+  GLenum ErrorCheckValue = glGetError();
+  assert(ErrorCheckValue == GL_NO_ERROR);
+
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+  glEnable(GL_PROGRAM_POINT_SIZE);
+
+  // Set per-frame uniforms.
+  glUseProgram(m_shader_draw_vpls.getShaderID());
+  glUniformMatrix4fv(m_shader_draw_vpls.getMatrixMVP(), 1, GL_FALSE, &m_matrix_MVP_user[0][0]);
+
+  glBindVertexArray(m_vpl_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, m_vpl_vbo);
+  glBufferData(GL_ARRAY_BUFFER, m_wcs_buffer.size()*sizeof(float), &m_wcs_buffer[0], GL_STREAM_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  glEnableVertexAttribArray(0);
+
+  glDrawArrays(GL_POINTS, 0, m_wcs_buffer.size());
+
+  glDisableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
   glUseProgram(0);
 }
